@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, X } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { productAPI, categoryAPI } from '../services/api';
 import type { Product, Category } from '../types/product';
 import ProductCard from '../components/ProductCard';
 import { ProductGridSkeleton } from '../components/LoadingSkeleton';
 
 export default function Products() {
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     loadCategories();
     loadProducts();
   }, [selectedCategory, sortBy]);
@@ -109,11 +112,7 @@ export default function Products() {
         </div>
 
         {/* Category Filters */}
-        <motion.div
-          initial={false}
-          animate={{ height: showFilters || window.innerWidth >= 768 ? 'auto' : 0 }}
-          className="overflow-hidden"
-        >
+        <div className={`${showFilters ? 'block' : 'hidden'} md:block`}>
           <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={() => setSelectedCategory('')}
@@ -139,7 +138,7 @@ export default function Products() {
               </button>
             ))}
           </div>
-        </motion.div>
+        </div>
       </motion.div>
 
       {/* Results Count */}

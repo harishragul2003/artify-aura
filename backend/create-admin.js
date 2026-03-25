@@ -8,7 +8,7 @@ dotenv.config();
 const { Pool } = pg;
 
 // Admin credentials - CHANGE THESE IF YOU WANT
-const ADMIN_EMAIL = 'admin@gmail.com';
+const ADMIN_EMAIL = 'artifaura28@gmail.com';
 const ADMIN_PASSWORD = 'admin123';
 const ADMIN_NAME = 'Admin User';
 const ADMIN_PHONE = '1234567890';

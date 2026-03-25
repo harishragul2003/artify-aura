@@ -140,6 +140,8 @@ export const getUserOrders = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
   try {
+    console.log('📦 Fetching all orders...');
+    
     // Get all orders with user information
     const ordersResult = await pool.query(`
       SELECT 
@@ -150,6 +152,8 @@ export const getAllOrders = async (req, res) => {
       LEFT JOIN users u ON o.user_id = u.id
       ORDER BY o.created_at DESC
     `);
+
+    console.log(`✅ Found ${ordersResult.rows.length} orders`);
 
     // Get order items with product details for each order
     const ordersWithItems = await Promise.all(
@@ -171,10 +175,19 @@ export const getAllOrders = async (req, res) => {
       })
     );
 
+    console.log('✅ Orders with items fetched successfully');
     res.json(ordersWithItems);
   } catch (error) {
-    console.error('Get all orders error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Get all orders error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code
+    });
+    res.status(500).json({ 
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 

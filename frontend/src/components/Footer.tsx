@@ -35,7 +35,9 @@ export default function Footer() {
             <div className="flex space-x-3">
               <motion.a
                 whileHover={{ scale: 1.2, rotate: 5 }}
-                href="#"
+                href="https://www.instagram.com/artify__aura"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary-500 transition-colors"
               >
                 <Instagram size={20} />
@@ -107,14 +109,14 @@ export default function Footer() {
               <li className="flex items-center space-x-3">
                 <Phone size={20} className="text-primary-400 flex-shrink-0" />
                 <div className="text-gray-400">
-                  <div>+91 6379181006</div>
-                  <div>+91 9566376453</div>
+                  <div>+91 8220038065</div>
+                  <div>+91 6369869758</div>
                 </div>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail size={20} className="text-primary-400 flex-shrink-0" />
                 <a href="mailto:artifyaura@gmail.com" className="text-gray-400 hover:text-primary-400 transition-colors">
-                  artifyaura@gmail.com
+                  artifyaura28@gmail.com
                 </a>
               </li>
             </ul>

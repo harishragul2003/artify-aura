@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Package, DollarSign, Users, TrendingUp, LayoutDashboard, ShoppingBag, Settings, Menu, X, UserCircle } from 'lucide-react';
 import { orderAPI, userAPI, productAPI, categoryAPI } from '../services/api';
@@ -741,8 +741,8 @@ function OrdersContent({ orders, loading, updateOrderStatus }: any) {
               </thead>
               <tbody>
                 {orders.map((order: any) => (
-                  <>
-                    <tr key={order.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-primary-200/50 dark:hover:bg-gray-700 transition-all duration-300">
+                  <React.Fragment key={order.id}>
+                    <tr className="border-b border-gray-100 dark:border-gray-800 hover:bg-primary-200/50 dark:hover:bg-gray-700 transition-all duration-300">
                       <td className="py-4 px-4 font-semibold text-gray-900 dark:text-white">#{order.id.slice(0, 8)}</td>
                       <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
                         <div className="text-sm">
@@ -798,7 +798,7 @@ function OrdersContent({ orders, loading, updateOrderStatus }: any) {
                                 <h4 className="font-bold text-lg mb-3 text-gray-900 dark:text-white">Payment Details</h4>
                                 <p className="text-gray-700 dark:text-gray-300">Transaction ID: {order.transaction_id || 'N/A'}</p>
                                 <p className="text-gray-700 dark:text-gray-300">Status: {order.payment_status}</p>
-                                {order.payment_screenshot_url && (
+                                {order.payment_screenshot_url ? (
                                   <button
                                     onClick={() => openScreenshotModal(order.payment_screenshot_url)}
                                     className="mt-3 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
@@ -806,6 +806,8 @@ function OrdersContent({ orders, loading, updateOrderStatus }: any) {
                                     <span>🖼️</span>
                                     <span>View Payment Screenshot</span>
                                   </button>
+                                ) : (
+                                  <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 italic">No payment screenshot uploaded</p>
                                 )}
                               </div>
                             </div>
@@ -839,7 +841,7 @@ function OrdersContent({ orders, loading, updateOrderStatus }: any) {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -868,25 +870,39 @@ function OrdersContent({ orders, loading, updateOrderStatus }: any) {
                 <X size={24} />
               </button>
             </div>
-            <div className="flex justify-center">
-              <img
-                src={screenshotModal}
-                alt="Payment Screenshot"
-                className="max-w-full h-auto rounded-lg shadow-lg"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
-                }}
-              />
+            <div className="flex justify-center bg-gray-100 dark:bg-gray-900 rounded-lg p-4">
+              {screenshotModal.startsWith('data:image') ? (
+                <img
+                  src={screenshotModal}
+                  alt="Payment Screenshot"
+                  className="max-w-full h-auto rounded-lg shadow-lg"
+                  onError={(e) => {
+                    console.error('Failed to load screenshot');
+                    e.currentTarget.style.display = 'none';
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'text-center p-8 text-gray-600 dark:text-gray-400';
+                    errorDiv.innerHTML = '<p class="text-xl mb-2">❌</p><p>Failed to load screenshot</p><p class="text-sm mt-2">The image data may be corrupted</p>';
+                    e.currentTarget.parentElement?.appendChild(errorDiv);
+                  }}
+                />
+              ) : (
+                <div className="text-center p-8 text-gray-600 dark:text-gray-400">
+                  <p className="text-xl mb-2">⚠️</p>
+                  <p>Invalid screenshot format</p>
+                  <p className="text-sm mt-2">Screenshot URL: {screenshotModal.substring(0, 50)}...</p>
+                </div>
+              )}
             </div>
             <div className="mt-4 flex justify-end space-x-3">
-              <a
-                href={screenshotModal}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300"
-              >
-                Open in New Tab
-              </a>
+              {screenshotModal.startsWith('data:image') && (
+                <a
+                  href={screenshotModal}
+                  download="payment-screenshot.png"
+                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300"
+                >
+                  Download
+                </a>
+              )}
               <button
                 onClick={closeScreenshotModal}
                 className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-400 dark:hover:bg-gray-500 transition-all duration-300"

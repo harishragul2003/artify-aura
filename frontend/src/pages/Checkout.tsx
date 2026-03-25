@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 export default function Checkout() {
   const navigate = useNavigate();
   const { cart, cartTotal, clearCart } = useCart();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     shipping_address: '',
@@ -18,6 +18,7 @@ export default function Checkout() {
     transaction_id: '',
   });
   const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
 
   if (!isAuthenticated) {
     navigate('/login');
@@ -29,6 +30,21 @@ export default function Checkout() {
     return null;
   }
 
+  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setScreenshot(file);
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setScreenshotPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setScreenshotPreview(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -39,8 +55,13 @@ export default function Checkout() {
 
     setLoading(true);
     try {
-      // In a real app, upload screenshot to cloud storage first
-      const payment_screenshot_url = 'https://example.com/screenshots/' + screenshot.name;
+      // Convert screenshot to base64 data URL
+      const payment_screenshot_url = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(screenshot);
+      });
 
       const orderData = {
         items: cart.map(item => ({
@@ -90,28 +111,28 @@ export default function Checkout() {
         >
           {/* Shipping Details */}
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Shipping Details</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Shipping Details</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Full Address</label>
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Full Address</label>
                 <textarea
                   required
                   rows={3}
                   value={formData.shipping_address}
                   onChange={(e) => setFormData({ ...formData, shipping_address: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
                   placeholder="Enter your complete shipping address"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Phone Number</label>
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Phone Number</label>
                 <input
                   type="tel"
                   required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
                   placeholder="+91 1234567890"
                 />
               </div>
@@ -120,7 +141,7 @@ export default function Checkout() {
 
           {/* Payment Details */}
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-            <h2 className="text-xl font-bold mb-4 flex items-center space-x-2">
+            <h2 className="text-xl font-bold mb-4 flex items-center space-x-2 text-gray-900 dark:text-white">
               <CreditCard size={24} />
               <span>Payment Details</span>
             </h2>
@@ -145,25 +166,25 @@ export default function Checkout() {
 
             {/* Transaction ID */}
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Transaction ID / UTR Number</label>
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Transaction ID / UTR Number</label>
               <input
                 type="text"
                 required
                 value={formData.transaction_id}
                 onChange={(e) => setFormData({ ...formData, transaction_id: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="Enter transaction ID"
               />
             </div>
 
             {/* Screenshot Upload */}
             <div>
-              <label className="block text-sm font-medium mb-2">Payment Screenshot</label>
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Payment Screenshot</label>
               <div className="relative">
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
+                  onChange={handleScreenshotChange}
                   className="hidden"
                   id="screenshot"
                 />
@@ -179,10 +200,22 @@ export default function Checkout() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="mt-2 flex items-center space-x-2 text-green-600"
+                  className="mt-4 space-y-2"
                 >
-                  <CheckCircle size={16} />
-                  <span className="text-sm">Screenshot uploaded</span>
+                  <div className="flex items-center space-x-2 text-green-600">
+                    <CheckCircle size={16} />
+                    <span className="text-sm">Screenshot uploaded</span>
+                  </div>
+                  {screenshotPreview && (
+                    <div className="mt-3 p-2 bg-gray-100 dark:bg-gray-700 rounded-xl">
+                      <p className="text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Preview:</p>
+                      <img
+                        src={screenshotPreview}
+                        alt="Payment screenshot preview"
+                        className="w-full h-auto max-h-64 object-contain rounded-lg border border-gray-300 dark:border-gray-600"
+                      />
+                    </div>
+                  )}
                 </motion.div>
               )}
             </div>

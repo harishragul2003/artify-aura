@@ -58,8 +58,10 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// Increase payload size limit for base64 images (50MB)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -121,6 +123,50 @@ app.get('/api/test-email', async (req, res) => {
         code: error.code,
         command: error.command
       }
+    });
+  }
+});
+
+// Test admin email endpoint
+app.get('/api/test-admin-email', async (req, res) => {
+  try {
+    const { sendAdminOrderNotification } = await import('./utils/emailServiceResend.js');
+    
+    const adminEmail = process.env.ADMIN_EMAIL;
+    console.log('🧪 Testing admin email to:', adminEmail);
+    
+    const result = await sendAdminOrderNotification(
+      {
+        id: 'test-' + Date.now(),
+        total_amount: 1500,
+        payment_status: 'Payment Verification Pending',
+        order_status: 'Pending',
+        shipping_address: '456 Admin Test Street, Test City, 67890',
+        items: [
+          { name: 'Test Product A', quantity: 1, price: 750 },
+          { name: 'Test Product B', quantity: 2, price: 375 }
+        ]
+      },
+      {
+        name: 'Test Customer',
+        email: 'testcustomer@example.com',
+        phone: '+91 9876543210'
+      }
+    );
+    
+    res.json({ 
+      success: true, 
+      message: 'Admin test email sent successfully!',
+      sentTo: adminEmail,
+      result: result
+    });
+  } catch (error) {
+    console.error('❌ Admin email test failed:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      stack: error.stack,
+      details: error
     });
   }
 });

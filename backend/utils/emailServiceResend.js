@@ -158,8 +158,15 @@ export const sendAdminOrderNotification = async (orderDetails, customerInfo) => 
   console.log('📧 Attempting to send admin notification via Resend for order:', orderDetails.id);
   
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || process.env.RESEND_FROM_EMAIL;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    
+    if (!adminEmail) {
+      console.error('❌ ADMIN_EMAIL not configured in environment variables');
+      throw new Error('Admin email not configured');
+    }
+    
     console.log('📧 Admin email address:', adminEmail);
+    console.log('📧 Using FROM email:', process.env.RESEND_FROM_EMAIL);
     
     const itemsList = orderDetails.items?.map(item => `
       <tr style="border-bottom: 1px solid #e5e7eb;">
@@ -169,7 +176,7 @@ export const sendAdminOrderNotification = async (orderDetails, customerInfo) => 
       </tr>
     `).join('') || '';
 
-    const { data, error } = await resend.emails.send({
+    const emailPayload = {
       from: process.env.RESEND_FROM_EMAIL || 'Artify Aura <onboarding@resend.dev>',
       to: [adminEmail],
       subject: `🔔 New Order - #${orderDetails.id?.slice(0, 8).toUpperCase()}`,
@@ -236,7 +243,7 @@ export const sendAdminOrderNotification = async (orderDetails, customerInfo) => 
               
               <!-- Action Button -->
               <div style="text-align: center;">
-                <a href="${process.env.FRONTEND_URL}/admin/orders" 
+                <a href="${process.env.FRONTEND_URL}/admin" 
                    style="display: inline-block; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: white; padding: 16px 40px; text-decoration: none; border-radius: 30px; font-weight: 600;">
                   Process Order →
                 </a>
@@ -251,9 +258,18 @@ export const sendAdminOrderNotification = async (orderDetails, customerInfo) => 
         </body>
         </html>
       `,
+    };
+
+    console.log('📧 Sending email with payload:', {
+      from: emailPayload.from,
+      to: emailPayload.to,
+      subject: emailPayload.subject
     });
 
+    const { data, error } = await resend.emails.send(emailPayload);
+
     if (error) {
+      console.error('❌ Resend API returned error:', error);
       throw error;
     }
 
@@ -261,6 +277,11 @@ export const sendAdminOrderNotification = async (orderDetails, customerInfo) => 
     return data;
   } catch (error) {
     console.error('❌ Resend admin email error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    });
     throw error;
   }
 };
