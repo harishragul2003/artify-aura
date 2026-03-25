@@ -33,6 +33,20 @@ body.dark {
   color: #f3f4f6;
 }
 
+/* Disable heavy background animation on mobile */
+@media (max-width: 767px) {
+  body:not(.dark) {
+    background: linear-gradient(135deg, #fef3c7 0%, #fecaca 50%, #fef3c7 100%);
+    background-size: 100% 100%;
+    animation: none;
+  }
+  body.dark {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    background-size: 100% 100%;
+    animation: none;
+  }
+}
+
 @keyframes gradient-flow {
   0%, 100% {
     background-position: 0% 50%;
@@ -70,7 +84,7 @@ body:not(.dark)::after {
   background-size: 30px 30px;
   pointer-events: none;
   z-index: 0;
-  animation: dots-move 20s linear infinite;
+  /* Removed dots-move animation - causes mobile repaints */
 }
 
 @keyframes dots-move {
@@ -131,9 +145,9 @@ body:not(.dark)::after {
   border-radius: 10px;
 }
 
-/* Smooth Transitions */
-* {
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+/* Smooth Transitions - scoped to avoid mobile reflow */
+a, button {
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Gradient Text Animation */
@@ -207,27 +221,29 @@ body:not(.dark)::after {
   }
 }
 
-/* Card Shine Effect */
+/* Card Shine Effect - disabled on mobile for performance */
 .card-shine {
   position: relative;
   overflow: hidden;
 }
 
-.card-shine::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 70%
-  );
-  transform: rotate(45deg);
-  animation: shine 4s infinite;
+@media (min-width: 768px) {
+  .card-shine::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 70%
+    );
+    transform: rotate(45deg);
+    animation: shine 4s infinite;
+  }
 }
 
 @keyframes shine {

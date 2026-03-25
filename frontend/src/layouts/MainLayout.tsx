@@ -58,8 +58,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen bg-transparent dark:bg-gradient-to-br dark:from-gray-900 dark:via-rose-900 dark:to-gray-900 transition-colors relative overflow-hidden">
-      {/* Animated Background Elements - Only in Dark Mode */}
-      <div className="fixed inset-0 pointer-events-none dark:block hidden">
+      {/* Animated Background Elements - Only in Dark Mode, only on desktop */}
+      <div className="fixed inset-0 pointer-events-none dark:hidden-mobile hidden md:dark:block">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
         <div className="absolute top-40 right-10 w-72 h-72 bg-accent-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{ animationDelay: '1s' }}></div>
         <div className="absolute -bottom-32 left-1/2 w-72 h-72 bg-primary-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
