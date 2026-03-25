@@ -58,6 +58,8 @@ export const userAPI = {
   getById: (id: string) => api.get(`/admin/users/${id}`),
   updateRole: (id: string, role: string) => api.put(`/admin/users/${id}/role`, { role }),
   delete: (id: string) => api.delete(`/admin/users/${id}`),
+  updateProfile: (data: { name?: string; phone?: string; avatar_url?: string }) =>
+    api.put('/users/profile', data),
 };
 
 export default api;

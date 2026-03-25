@@ -76,3 +76,26 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Update own profile (authenticated user)
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, phone, avatar_url } = req.body;
+    const userId = req.user.id;
+
+    const result = await pool.query(
+      `UPDATE users SET
+        name = COALESCE($1, name),
+        phone = COALESCE($2, phone),
+        avatar_url = COALESCE($3, avatar_url)
+       WHERE id = $4
+       RETURNING id, name, email, phone, role, avatar_url, created_at`,
+      [name || null, phone || null, avatar_url || null, userId]
+    );
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

@@ -3,18 +3,17 @@ import { motion } from 'framer-motion';
 import { User, Mail, Phone, Camera, Save, X, Edit2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { userAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
-const AVATAR_KEY = 'profile_avatar';
-
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: user?.name || '', phone: user?.phone || '' });
   const [savedForm, setSavedForm] = useState({ name: user?.name || '', phone: user?.phone || '' });
-  const [avatar, setAvatar] = useState<string | null>(localStorage.getItem(AVATAR_KEY));
   const [pendingAvatar, setPendingAvatar] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const getInitials = () => {
     if (!user?.name) return 'U';
@@ -41,22 +40,32 @@ export default function Dashboard() {
     setEditing(false);
   };
 
-  const handleSave = () => {
-    if (pendingAvatar) {
-      localStorage.setItem(AVATAR_KEY, pendingAvatar);
-      setAvatar(pendingAvatar);
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload: { name?: string; phone?: string; avatar_url?: string } = {
+        name: form.name,
+        phone: form.phone,
+      };
+      if (pendingAvatar) payload.avatar_url = pendingAvatar;
+
+      const { data } = await userAPI.updateProfile(payload);
+      updateUser(data);
+      setSavedForm({ name: data.name, phone: data.phone || '' });
       setPendingAvatar(null);
+      toast.success('Profile updated!');
+      setEditing(false);
+    } catch (err) {
+      toast.error('Failed to update profile');
+    } finally {
+      setSaving(false);
     }
-    setSavedForm({ ...form });
-    toast.success('Profile updated!');
-    setEditing(false);
   };
 
-  const displayAvatar = pendingAvatar || avatar;
+  const displayAvatar = pendingAvatar || user?.avatar_url;
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Back button */}
       <motion.button
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
@@ -75,15 +84,12 @@ export default function Dashboard() {
         transition={{ duration: 0.4 }}
         className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-primary-100 dark:border-primary-900 overflow-hidden"
       >
-        {/* Banner */}
         <div className="h-28 bg-gradient-to-r from-primary-500 to-accent-500 relative">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         </div>
 
         <div className="px-8 pb-8">
-          {/* Avatar + action buttons row */}
           <div className="flex items-end justify-between -mt-14 mb-6">
-            {/* Avatar */}
             <div className="relative group">
               <div className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 shadow-xl overflow-hidden bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
                 {displayAvatar
@@ -100,38 +106,27 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* Action buttons */}
             <div className="flex space-x-2">
               {editing ? (
                 <>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                    onClick={handleSave}
-                    className="flex items-center space-x-1.5 px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-xl text-sm font-semibold shadow-lg hover:shadow-primary-500/40 transition-all duration-200"
-                  >
-                    <Save size={15} /><span>Save</span>
+                  <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSave} disabled={saving}
+                    className="flex items-center space-x-1.5 px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-xl text-sm font-semibold shadow-lg transition-all duration-200 disabled:opacity-60">
+                    <Save size={15} /><span>{saving ? 'Saving...' : 'Save'}</span>
                   </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                    onClick={handleCancel}
-                    className="flex items-center space-x-1.5 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
-                  >
+                  <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleCancel}
+                    className="flex items-center space-x-1.5 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-all duration-200">
                     <X size={15} /><span>Cancel</span>
                   </motion.button>
                 </>
               ) : (
-                <motion.button
-                  whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                  onClick={handleEdit}
-                  className="flex items-center space-x-1.5 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold hover:bg-primary-100 dark:hover:bg-gray-600 transition-all duration-200"
-                >
+                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleEdit}
+                  className="flex items-center space-x-1.5 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold hover:bg-primary-100 dark:hover:bg-gray-600 transition-all duration-200">
                   <Edit2 size={15} /><span>Edit Profile</span>
                 </motion.button>
               )}
             </div>
           </div>
 
-          {/* Name & role badge */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user?.name}</h1>
             <span className={`inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-semibold ${
@@ -143,7 +138,6 @@ export default function Dashboard() {
             </span>
           </div>
 
-          {/* Fields */}
           <div className="space-y-3">
             <Field icon={<User size={16} />} label="Full Name" value={form.name} editing={editing} onChange={(v) => setForm({ ...form, name: v })} />
             <Field icon={<Mail size={16} />} label="Email Address" value={user?.email || ''} editing={false} onChange={() => {}} />
@@ -171,7 +165,7 @@ function Field({ icon, label, value, editing, onChange, placeholder }: {
         {editing
           ? <input type="text" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)}
               className="w-full text-sm font-medium text-gray-900 dark:text-white bg-transparent border-b border-primary-400 focus:outline-none focus:border-primary-600 transition-colors placeholder:text-gray-300 dark:placeholder:text-gray-600" />
-          : <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{value || <span className="text-gray-400">—</span>}</p>
+          : <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{value || '—'}</p>
         }
       </div>
     </div>

@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
+  updateUser: (updated: Partial<User>) => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
@@ -86,16 +87,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     
-    // Show success message
     toast.success('👋 Logged out successfully! See you soon!', {
       duration: 2000,
-      style: {
-        background: '#3b82f6',
-        color: '#fff',
-        fontWeight: 'bold',
-        padding: '16px',
-      },
+      style: { background: '#3b82f6', color: '#fff', fontWeight: 'bold', padding: '16px' },
     });
+  };
+
+  const updateUser = (updated: Partial<User>) => {
+    const newUser = { ...user, ...updated } as User;
+    setUser(newUser);
+    localStorage.setItem('user', JSON.stringify(newUser));
   };
 
   return (
@@ -106,6 +107,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         register,
         logout,
+        updateUser,
         isAuthenticated: !!token,
         isAdmin: user?.role === 'admin',
       }}

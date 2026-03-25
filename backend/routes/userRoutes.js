@@ -1,9 +1,12 @@
 import express from 'express';
-import { getAllUsers, getUserById, updateUserRole, deleteUser } from '../controllers/userController.js';
+import { getAllUsers, getUserById, updateUserRole, deleteUser, updateProfile } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { adminOnly } from '../middleware/roleMiddleware.js';
 
 const router = express.Router();
+
+// Authenticated user routes
+router.put('/profile', protect, updateProfile);
 
 // Admin only routes
 router.get('/', protect, adminOnly, getAllUsers);

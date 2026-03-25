@@ -12,8 +12,12 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+    avatar_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add avatar_url to existing users table if not exists
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 
 -- Categories Table
 CREATE TABLE IF NOT EXISTS categories (

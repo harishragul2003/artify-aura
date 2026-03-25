@@ -48,7 +48,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     return user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const [savedAvatar] = useState(() => localStorage.getItem('profile_avatar'));
+  const savedAvatar = user?.avatar_url || null;
 
   const handleLogout = () => {
     setDropdownOpen(false);

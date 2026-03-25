@@ -29,7 +29,7 @@ export const register = async (req, res) => {
     // Create user
     console.log('💾 Creating new user...');
     const result = await pool.query(
-      'INSERT INTO users (name, email, password, phone, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role, created_at',
+      'INSERT INTO users (name, email, password, phone, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role, avatar_url, created_at',
       [name, email, hashedPassword, phone || null, 'user']
     );
 
@@ -46,6 +46,7 @@ export const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar_url: user.avatar_url,
         created_at: user.created_at
       }
     });
@@ -108,6 +109,7 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar_url: user.avatar_url,
         created_at: user.created_at
       }
     });
