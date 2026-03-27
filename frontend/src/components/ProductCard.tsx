@@ -3,6 +3,7 @@ import { ShoppingCart, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Product } from '../types/product';
 import { useCart } from '../context/CartContext';
+import OptimizedImage from './OptimizedImage';
 
 interface ProductCardProps {
   product: Product;
@@ -24,13 +25,19 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       <div className="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-accent-500/0 to-primary-500/0 group-hover:from-primary-500/20 group-hover:via-accent-500/20 group-hover:to-primary-500/20 transition-all duration-500 pointer-events-none"></div>
       {/* Image */}
       <Link to={`/products/${product.id}`} className="block relative overflow-hidden aspect-square group">
-        <motion.img
+        <motion.div
           whileHover={{ scale: 1.15 }}
           transition={{ duration: 0.5 }}
-          src={product.image_url || 'https://via.placeholder.com/400'}
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
+          className="w-full h-full"
+        >
+          <OptimizedImage
+            src={product.image_url}
+            alt={product.name}
+            width={400}
+            height={400}
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
         {/* Overlay on Hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         

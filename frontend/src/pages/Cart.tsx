@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import OptimizedImage from '../components/OptimizedImage';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();
@@ -69,11 +70,13 @@ export default function Cart() {
               >
                 <div className="flex gap-4">
                   {/* Image */}
-                  <Link to={`/products/${item.id}`} className="flex-shrink-0">
-                    <img
-                      src={item.image_url || 'https://via.placeholder.com/150'}
+                  <Link to={`/products/${item.id}`} className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden">
+                    <OptimizedImage
+                      src={item.image_url}
                       alt={item.name}
-                      className="w-24 h-24 object-cover rounded-xl"
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-cover"
                     />
                   </Link>
 

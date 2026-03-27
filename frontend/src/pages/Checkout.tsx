@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderAPI } from '../services/api';
 import toast from 'react-hot-toast';
+import OptimizedImage from '../components/OptimizedImage';
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -234,11 +235,15 @@ export default function Checkout() {
             <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
               {cart.map((item) => (
                 <div key={item.id} className="flex gap-3">
-                  <img
-                    src={item.image_url || 'https://via.placeholder.com/60'}
-                    alt={item.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
+                  <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                    <OptimizedImage
+                      src={item.image_url}
+                      alt={item.name}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{item.name}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">

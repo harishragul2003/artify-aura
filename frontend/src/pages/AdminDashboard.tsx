@@ -6,6 +6,7 @@ import type { Order } from '../types/order';
 import type { ProductInput } from '../types/product';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
+import OptimizedImage from '../components/OptimizedImage';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -483,11 +484,15 @@ function ProductsContent() {
               transition={{ delay: index * 0.1 }}
               className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-primary-900 hover:shadow-2xl transition-all duration-300"
             >
-              <img
-                src={product.image_url || 'https://via.placeholder.com/300'}
-                alt={product.name}
-                className="w-full h-48 object-cover rounded-xl mb-4"
-              />
+              <div className="w-full h-48 rounded-xl overflow-hidden mb-4">
+                <OptimizedImage
+                  src={product.image_url}
+                  alt={product.name}
+                  width={300}
+                  height={192}
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">{product.name}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{product.description}</p>
               
@@ -819,11 +824,15 @@ function OrdersContent({ orders, loading, updateOrderStatus }: any) {
                                   {order.items.map((item: any, idx: number) => (
                                     <div key={idx} className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-lg">
                                       <div className="flex items-center space-x-4">
-                                        <img 
-                                          src={item.product_image || 'https://via.placeholder.com/80'} 
-                                          alt={item.product_name}
-                                          className="w-16 h-16 object-cover rounded-lg"
-                                        />
+                                        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                          <OptimizedImage
+                                            src={item.product_image}
+                                            alt={item.product_name}
+                                            width={64}
+                                            height={64}
+                                            className="w-full h-full object-cover"
+                                          />
+                                        </div>
                                         <div>
                                           <p className="font-semibold text-gray-900 dark:text-white">{item.product_name}</p>
                                           <p className="text-sm text-gray-600 dark:text-gray-400">Quantity: {item.quantity}</p>

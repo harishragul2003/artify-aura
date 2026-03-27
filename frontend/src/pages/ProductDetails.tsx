@@ -6,6 +6,7 @@ import { productAPI } from '../services/api';
 import type { Product } from '../types/product';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
+import OptimizedImage from '../components/OptimizedImage';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -57,13 +58,20 @@ export default function ProductDetails() {
           className="relative"
         >
           <div className="aspect-square rounded-3xl overflow-hidden bg-white dark:bg-gray-800 shadow-2xl">
-            <motion.img
+            <motion.div
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.3 }}
-              src={product.image_url || 'https://via.placeholder.com/600'}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
+              className="w-full h-full"
+            >
+              <OptimizedImage
+                src={product.image_url}
+                alt={product.name}
+                width={600}
+                height={600}
+                priority={true}
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
           </div>
           {product.is_featured && (
             <div className="absolute top-6 left-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-full font-semibold shadow-lg">
