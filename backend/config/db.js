@@ -9,11 +9,10 @@ const { Pool } = pg;
 const pool = process.env.DATABASE_URL 
   ? new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false
-      },
-      max: 20,
-      idleTimeoutMillis: 30000,
+      ssl: { rejectUnauthorized: false },
+      max: 3,
+      min: 1,
+      idleTimeoutMillis: 10000,
       connectionTimeoutMillis: 10000,
     })
   : new Pool({
@@ -22,15 +21,11 @@ const pool = process.env.DATABASE_URL
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      ssl: {
-        rejectUnauthorized: false
-      },
-      // Connection pool settings
-      max: 20, // Maximum number of clients in the pool
-      min: 2, // Minimum number of clients in the pool
-      idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-      connectionTimeoutMillis: 10000, // Return an error after 10 seconds if connection could not be established
-      // Force IPv4 to avoid IPv6 timeout issues
+      ssl: { rejectUnauthorized: false },
+      max: 3,
+      min: 1,
+      idleTimeoutMillis: 10000,
+      connectionTimeoutMillis: 10000,
       family: 4,
     });
 
