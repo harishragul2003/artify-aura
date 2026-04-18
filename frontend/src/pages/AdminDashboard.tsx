@@ -734,29 +734,47 @@ function OrdersContent({ orders, loading, updateOrderStatus }: any) {
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full">
               <thead>
-                <tr className="border-b-2 border-primary-200 dark:border-gray-700">
-                  <th className="text-left py-4 px-4 font-bold">Order ID</th>
-                  <th className="text-left py-4 px-4 font-bold">Customer</th>
-                  <th className="text-left py-4 px-4 font-bold">Date</th>
-                  <th className="text-left py-4 px-4 font-bold">Amount</th>
-                  <th className="text-left py-4 px-4 font-bold">Payment</th>
-                  <th className="text-left py-4 px-4 font-bold">Status</th>
-                  <th className="text-left py-4 px-4 font-bold">Actions</th>
+                <tr className="rounded-xl overflow-hidden">
+                  <th className="py-4 px-4 text-left">
+                    <span className="inline-block bg-gradient-to-r from-violet-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">Order ID</span>
+                  </th>
+                  <th className="py-4 px-4 text-left">
+                    <span className="inline-block bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">Name</span>
+                  </th>
+                  <th className="py-4 px-4 text-left">
+                    <span className="inline-block bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">Date</span>
+                  </th>
+                  <th className="py-4 px-4 text-left">
+                    <span className="inline-block bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">Amount</span>
+                  </th>
+                  <th className="py-4 px-4 text-left">
+                    <span className="inline-block bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">Payment Verification</span>
+                  </th>
+                  <th className="py-4 px-4 text-left">
+                    <span className="inline-block bg-gradient-to-r from-indigo-500 to-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">Order Status</span>
+                  </th>
+                  <th className="py-4 px-4 text-left">
+                    <span className="inline-block bg-gradient-to-r from-primary-500 to-accent-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">Actions</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((order: any) => (
                   <React.Fragment key={order.id}>
                     <tr className="border-b border-gray-100 dark:border-gray-800 hover:bg-primary-200/50 dark:hover:bg-gray-700 transition-all duration-300">
-                      <td className="py-4 px-4 font-semibold text-gray-900 dark:text-white">#{order.id.slice(0, 8)}</td>
+                      <td className="py-4 px-4">
+                        <span className="font-bold text-violet-600 dark:text-violet-400">#{order.id.slice(0, 8)}</span>
+                      </td>
                       <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
                         <div className="text-sm">
-                          <div className="font-medium">{order.user_name || 'Guest'}</div>
-                          <div className="text-gray-500 dark:text-gray-400">{order.phone}</div>
+                          <div className="font-semibold text-blue-600 dark:text-blue-400">{order.user_name || 'Guest'}</div>
+                          <div className="text-gray-500 dark:text-gray-400 text-xs">{order.phone}</div>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-gray-700 dark:text-gray-300">{new Date(order.created_at).toLocaleDateString()}</td>
-                      <td className="py-4 px-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-accent-600">₹{order.total_amount}</td>
+                      <td className="py-4 px-4">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-medium text-sm">{new Date(order.created_at).toLocaleDateString()}</span>
+                      </td>
+                      <td className="py-4 px-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">₹{order.total_amount}</td>
                       <td className="py-4 px-4">
                         <select
                           value={order.payment_status}
