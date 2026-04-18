@@ -54,13 +54,20 @@ export default function AdminDashboard() {
   };
 
   const updateOrderStatus = async (orderId: string, status: string, type: 'order' | 'payment') => {
+    // Optimistic update — change UI instantly
+    setOrders(prev => prev.map(o =>
+      o.id === orderId
+        ? { ...o, [type === 'order' ? 'order_status' : 'payment_status']: status }
+        : o
+    ));
     try {
       await orderAPI.updateOrderStatus(orderId, {
         [type === 'order' ? 'order_status' : 'payment_status']: status
       });
-      loadOrders();
     } catch (error) {
       console.error('Failed to update order', error);
+      // Revert on failure
+      loadOrders();
     }
   };
 
